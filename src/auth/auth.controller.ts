@@ -9,7 +9,6 @@ import {
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { SignInDto } from './dto/sign-in.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,14 +21,12 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('/login')
-  signIn(@Request() req: any, signInDto: SignInDto): object {
+  signIn(@Request() req: any): object {
     return this.authService.signIn(req.user.id);
   }
 
   @Post('/refresh')
-  async refresh(@Headers('refresh-token') refreshToken: string) {
+  async refresh(@Headers('Authorization') refreshToken: string) {
     return await this.authService.refreshToken(refreshToken);
-
-
   }
 }

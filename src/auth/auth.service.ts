@@ -27,10 +27,7 @@ export class AuthService {
     if (existedUser) 
       throw new BadRequestException('이미 가입된 이메일입니다.');
     
-
-    const isPasswordMatched = password === passwordConfirm;
-
-    if (!isPasswordMatched) 
+    if (password !== passwordConfirm) 
       throw new BadRequestException('비밀번호가 서로 일치하지 않습니다.')
 
     const hashRound = parseInt(this.configService.get<string>('PASSWORD_HASH_ROUNDS'));
@@ -46,49 +43,42 @@ export class AuthService {
   }
 
   async signIn(id: number) {
-    const payload = { id };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign({ id });
 
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const refreshToken = this.jwtService.sign({ id }, { expiresIn: '1d' });
 
-    await this.userRepository.update(id, { refreshToken });
+    await this.userRepository.update(id, { refreshToken: refreshToken });
 
     return { accessToken, refreshToken };
   }
 
   async validateUser({ email, password }: SignInDto) {
     const user = await this.userRepository.findOne({
-      where: { email },
-      select: { id: true, password: true },
+      where: { email: email },
+      select: { id: true, password: true
+    }
     });
 
-    const isPasswordMatched = compareSync(
-      password,
-      user?.password ?? '',
-    );
+    const isPasswordMatched = compareSync(password, user.password);
 
     if (!user) 
       throw new NotFoundException('해당 사용자가 존재하지 않습니다.')
     if (!isPasswordMatched) 
-      throw new BadRequestException('INVALID_PASSWORD')
+      throw new BadRequestException('패스워드가 서로 일치하지 않습니다.')
    
     return { id: user.id };
   }
 
   async refreshToken(refreshToken: string) {
-    try {
       const { id } = this.jwtService.verify(refreshToken);
       const user = await this.userRepository.findOneBy({ id });
-
-      if (!user || user.refreshToken !== refreshToken) {
+    
+      if (user.refreshToken !== refreshToken) {
         throw new UnauthorizedException('토큰이 유효하지 않습니다.');
       }
 
       const accessToken = this.jwtService.sign({ id });
 
       return { accessToken };
-    } catch (err) {
-      throw new UnauthorizedException('토큰이 유효하지 않습니다.');
-    }
   }
 }
