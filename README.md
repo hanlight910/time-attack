@@ -3,4 +3,5 @@
 요구조건을 먼저 총족시킨다는 생각으로 임하였던 것과 지저분하지 않고 중복되는 것은 제거하고 가독성 있게 코드를 짜자고 생각했습니다.
 ERD: ![image](https://github.com/hanlight910/time-attack/assets/146516139/a77b79e8-9d29-4f33-88dc-e565a0d04321)
 
-API 명세서: ![image](https://github.com/hanlight910/time-attack/assets/146516139/adc4e908-0003-4b5d-94f2-baad96e3b154)
+API 명세서: ![image](https://github.com/hanlight910/time-attack/assets/146516139/4b4f49ba-12d7-40b7-b32b-ffb53f88c4be)
+
